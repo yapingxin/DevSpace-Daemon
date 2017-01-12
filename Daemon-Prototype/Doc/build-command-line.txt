@@ -1,0 +1,18 @@
+============================
+Original C/C++ Command Line
+============================
+
+
+-W"switch" -W"no-deprecated-declarations" -W"empty-body" -W"conversion" -W"return-type" -W"parentheses" -W"no-pointer-sign" -W"no-format" -W"uninitialized" -W"unreachable-code" -W"unused-function" -W"unused-value" -W"unused-variable" -std=c++11 -x c -Wall -fno-strict-aliasing -g2 -gdwarf-2 -O0 -fthreadsafe-statics -W"switch" -W"no-deprecated-declarations" -W"empty-body" -W"conversion" -W"return-type" -W"parentheses" -W"no-format" -W"uninitialized" -W"unreachable-code" -W"unused-function" -W"unused-value" -W"unused-variable" -frtti -fno-omit-frame-pointer -std=c11 -fexceptions -o "C:\Work\DevSpace\DevSpace-Daemon\Daemon-Prototype\Server\obj\x64\Debug\%(filename).o" 
+
+=====================================
+Original C/C++ Command Line :: Issues
+=====================================
+
+1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Application Type\Linux\1.0\Linux.Common.targets(245,5): warning : command line option ¡®-fthreadsafe-statics¡¯ is valid for C++/ObjC++ but not for C
+1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Application Type\Linux\1.0\Linux.Common.targets(245,5): warning : command line option ¡®-frtti¡¯ is valid for C++/ObjC++ but not for C
+
+warning : command line option ¡®-fthreadsafe-statics¡¯ is valid for C++/ObjC++ but not for C
+
+warning : command line option ¡®-frtti¡¯ is valid for C++/ObjC++ but not for C
+
