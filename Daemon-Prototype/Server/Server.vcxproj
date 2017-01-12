@@ -61,44 +61,46 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="Code\lib\log\zf_log.c" />
     <ClCompile Include="Code\utility\main.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Code\lib\log\zf_log.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <CompileAs>CompileAsC</CompileAs>
-      <CLanguageStandard>c89</CLanguageStandard>
+      <CLanguageStandard>c99</CLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <CompileAs>CompileAsC</CompileAs>
-      <CLanguageStandard>c89</CLanguageStandard>
+      <CLanguageStandard>c99</CLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <CompileAs>CompileAsC</CompileAs>
-      <CLanguageStandard>c89</CLanguageStandard>
+      <CLanguageStandard>c99</CLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <CompileAs>CompileAsC</CompileAs>
-      <CLanguageStandard>c89</CLanguageStandard>
+      <CLanguageStandard>c99</CLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <ClCompile>
       <CompileAs>CompileAsC</CompileAs>
-      <CLanguageStandard>c89</CLanguageStandard>
+      <CLanguageStandard>c99</CLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <ClCompile>
       <CompileAs>CompileAsC</CompileAs>
-      <CLanguageStandard>c89</CLanguageStandard>
+      <CLanguageStandard>c99</CLanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

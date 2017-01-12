@@ -4,10 +4,24 @@
     <ClCompile Include="Code\utility\main.c">
       <Filter>utility</Filter>
     </ClCompile>
+    <ClCompile Include="Code\lib\log\zf_log.c">
+      <Filter>lib\log</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utility">
       <UniqueIdentifier>{f159fcc5-b0d5-4149-a58b-992eed62b777}</UniqueIdentifier>
     </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{cf5891a0-2d3e-4745-ae7a-88162a31a29b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib\log">
+      <UniqueIdentifier>{cf37a85e-fcc3-455f-95b2-96dde04d2c03}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Code\lib\log\zf_log.h">
+      <Filter>lib\log</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
