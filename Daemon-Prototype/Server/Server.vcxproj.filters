@@ -7,6 +7,9 @@
     <ClCompile Include="Code\lib\log\zf_log.c">
       <Filter>lib\log</Filter>
     </ClCompile>
+    <ClCompile Include="Code\utility\logfunc.c">
+      <Filter>utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utility">
@@ -22,6 +25,9 @@
   <ItemGroup>
     <ClInclude Include="Code\lib\log\zf_log.h">
       <Filter>lib\log</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\utility\logfunc.h">
+      <Filter>utility</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
