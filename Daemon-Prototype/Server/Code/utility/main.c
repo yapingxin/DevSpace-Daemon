@@ -30,7 +30,7 @@ static void accept_request(int);
 int main(int argc, char *argv[])
 {
 	int server_sock = -1;
-	unsigned short port = 80;
+	unsigned short port = 8001;
 	int client_sock = -1;
 	struct sockaddr_in client_socket_addr = { 0 };
 	int client_socket_addr_len = sizeof(struct sockaddr_in);
