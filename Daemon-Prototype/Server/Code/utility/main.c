@@ -178,6 +178,9 @@ static void accept_request(int client)
 
 	numchars = get_line(client, accept_buf, 1024 * sizeof(char));
 
+	ZF_LOGI("Completed accept_request with client = %i", client);
+	printf("Completed accept_request with client = %d\n", client);
+
 	close(client);
 }
 
