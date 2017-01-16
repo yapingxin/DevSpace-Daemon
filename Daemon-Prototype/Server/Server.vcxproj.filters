@@ -10,6 +10,9 @@
     <ClCompile Include="Code\utility\logfunc.c">
       <Filter>utility</Filter>
     </ClCompile>
+    <ClCompile Include="Code\utility\recvlogic.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="utility">
@@ -27,6 +30,9 @@
       <Filter>lib\log</Filter>
     </ClInclude>
     <ClInclude Include="Code\utility\logfunc.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\utility\recvlogic.h">
       <Filter>utility</Filter>
     </ClInclude>
   </ItemGroup>

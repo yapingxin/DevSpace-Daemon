@@ -17,19 +17,15 @@
 #include <stdlib.h>
 
 #include <inttypes.h>
-#include <linux/tcp.h> /* #define TCP_NODELAY 1 */
 
 #define MAXPENDING 5
-#define BUFSIZE 1024
+
 
 #include "logfunc.h"
-
-#define ISspace(x) isspace((int)(x))
+#include "recvlogic.h"
 
 #define SERVER_STRING "Tint HTTP Application Server: 0.1.0\r\n"
 /* Socket Server Header End */
-
-static void error_die(const char *sc);
 
 /*
 
@@ -61,9 +57,6 @@ static void error_die(const char *sc);
 
 */
 
-static void log_client_info(struct sockaddr_in * p_client_addr);
-static void accept_request(int client_sockfd);
-
 
 int main(int argc, char *argv[])
 {
@@ -73,7 +66,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in server_addr = { 0 };
 	struct sockaddr_in client_addr = { 0 };
 	socklen_t client_addr_len = sizeof(struct sockaddr_in);
-	int flag;
+	
 	int ret;
 
 	file_output_open(global_log_file_path);
@@ -84,12 +77,6 @@ int main(int argc, char *argv[])
 	ZF_LOGI("**       Tiny HTTP Application Server Start        **");
 	ZF_LOGI("*****************************************************");
 	ZF_LOGI("");
-
-	//ZF_LOGI("You will see the number of arguments: %i", argc);
-	//ZF_LOGD("You will NOT see the first argument: %s", *argv);
-
-	//ZF_LOGW("You will see this WARNING message");
-	//ZF_LOGI("You will NOT see this INFO message");
 
 	server_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (server_sockfd < 0)
@@ -102,8 +89,8 @@ int main(int argc, char *argv[])
 	}
 
 	/* Disable the Nagle (TCP No Delay) algorithm */
-	flag = 1;
-	ret = setsockopt(server_sockfd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(flag));
+	
+	ret = disable_tcp_nagle(server_sockfd);
 	if (ret == -1)
 	{
 		ZF_LOGW("Couldn't setsockopt(TCP_NODELAY)");
@@ -158,61 +145,5 @@ int main(int argc, char *argv[])
 	}
 
     return 0;
-}
-
-static void accept_request(int client_sockfd)
-{
-	static char buffer[BUFSIZE] = { 0 };
-
-	size_t num_bytes_rcvd = 0;
-
-	num_bytes_rcvd = recv(client_sockfd, buffer, BUFSIZE, 0);
-	if (num_bytes_rcvd < 0)
-	{
-		error_die("recv() failed.");
-	}
-
-	/* if num_bytes_rcvd == 0 then the end of stream is reached. */
-	while (num_bytes_rcvd > 0)
-	{
-		ZF_LOGI("Recv: %s", buffer);
-		printf("Recv: %s\n", buffer);
-
-		num_bytes_rcvd = recv(client_sockfd, buffer, BUFSIZE, 0);
-		if (num_bytes_rcvd < 0)
-		{
-			error_die("recv() failed.");
-		}
-	}
-
-	close(client_sockfd);
-}
-
-static void log_client_info(struct sockaddr_in *p_client_addr)
-{
-	static char client_name[INET_ADDRSTRLEN] = { 0 };
-
-	const char *ret_constxt = inet_ntop(AF_INET, &p_client_addr->sin_addr.s_addr, client_name, INET_ADDRSTRLEN);
-	if (ret_constxt != NULL)
-	{
-		ZF_LOGI("Handling client %s/%i", client_name, ntohs(p_client_addr->sin_port));
-		printf("Handling client %s/%d\n", client_name, ntohs(p_client_addr->sin_port));
-	}
-}
-
-
-/**********************************************************************/
-/* Print out an error message with perror() (for system errors; based
-* on value of errno, which indicates system call errors) and exit the
-* program indicating an error. */
-/**********************************************************************/
-static void error_die(const char *sc)
-{
-	ZF_LOGF("%s", sc);
-
-	printf("%s\n", sc);
-
-	perror(sc);
-	exit(1);
 }
 
