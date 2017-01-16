@@ -60,6 +60,24 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <RemoteCCompileToolExe>gcc</RemoteCCompileToolExe>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <RemoteCCompileToolExe>gcc</RemoteCCompileToolExe>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <RemoteCCompileToolExe>gcc</RemoteCCompileToolExe>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <RemoteCCompileToolExe>gcc</RemoteCCompileToolExe>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <RemoteCCompileToolExe>gcc</RemoteCCompileToolExe>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <RemoteCCompileToolExe>gcc</RemoteCCompileToolExe>
+  </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="Code\lib\log\zf_log.c" />
     <ClCompile Include="Code\utility\logfunc.c" />

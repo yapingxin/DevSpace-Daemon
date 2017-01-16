@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 	int client_sock = -1;
 	struct sockaddr_in client_socket_addr = { 0 };
 	int client_socket_addr_len = sizeof(struct sockaddr_in);
-	pthread_t newthread = NULL;
+	pthread_t accept_request_thread = NULL;
 
 	file_output_open(global_log_file_path);
 
@@ -64,16 +64,13 @@ int main(int argc, char *argv[])
 			error_die("accept() failed.");
 		}
 
-		/* accept_request(client_sock); */
-		//pthread_create(&newthread, NULL, accept_request, (void**)client_sock);
-		//pthread_create(&newthread, NULL, accept_request, NULL);
-		
-		
-		if (pthread_create(&newthread, NULL, accept_request, client_sock) != 0)
+		/* accept_request(&client_sock); */
+		if (pthread_create(&accept_request_thread, NULL, (void *)accept_request, (void *)&client_sock) != 0)
 		{
 			error_die("pthread_create() failed.");
 		}
-		
+
+		close(server_sock);
 	}
 
 	printf("Server is ruinning.\n");
@@ -81,48 +78,65 @@ int main(int argc, char *argv[])
 }
 
 
-static int startup(unsigned short *port)
+/**********************************************************************/
+/* This function starts the process of listening for web connections
+* on a specified port.  If the port is 0, then dynamically allocate a
+* port and modify the original port variable to reflect the actual
+* port.
+* Parameters: pointer to variable containing the port to connect on
+* Returns: the socket
+*
+* Links:
+* - setsockopt()--Set Socket Options
+*   https://www.ibm.com/support/knowledgecenter/en/ssw_i5_54/apis/ssocko.htm
+*   http://www.cnblogs.com/hateislove214/archive/2010/11/05/1869886.html
+*/
+/**********************************************************************/
+int startup(unsigned short *port)
 {
-	const int listen_count = 5;
+	const int listen_backlog = 5;
 
 	int httpd = 0;
-	struct sockaddr_in server_socket_addr = { 0 };
-	int addr_size;
+	int option_value = 1;
+	struct sockaddr_in addr;
 
 	httpd = socket(PF_INET, SOCK_STREAM, 0);
 	if (httpd == -1)
 	{
-		error_die("socket() initialize failed.");
+		error_die("socket");
 	}
 
-	memset(&server_socket_addr, 0, sizeof(struct sockaddr_in));
-	server_socket_addr.sin_family = AF_INET;
-	server_socket_addr.sin_port = htons(*port);
-	server_socket_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	if (bind(httpd, (struct sockaddr *)&server_socket_addr, sizeof(struct sockaddr_in)) < 0)
+	memset(&addr, 0, sizeof(struct sockaddr_in));
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(*port);
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if ((setsockopt(httpd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int))) < 0)
 	{
-		error_die("socket bind() failed.");
+		error_die("setsockopt failed");
 	}
 
-	/* if dynamically allocating a port */
-	if (*port == 0)
+	if (bind(httpd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)) < 0)
 	{
-		addr_size = sizeof(struct sockaddr_in);
-		if (getsockname(httpd, (struct sockaddr *)&server_socket_addr, &addr_size) == -1)
+		error_die("bind");
+	}
+
+	if (*port == 0)  /* if dynamically allocating a port */
+	{
+		socklen_t namelen = sizeof(struct sockaddr_in);
+		if (getsockname(httpd, (struct sockaddr *)&addr, &namelen) == -1)
 		{
-			error_die("getsockname() failed.");
+			error_die("getsockname");
 		}
 
-		*port = ntohs(server_socket_addr.sin_port);
+		*port = ntohs(addr.sin_port);
 	}
 
-	if (listen(httpd, listen_count) < 0)
+	if (listen(httpd, listen_backlog) < 0)
 	{
-		error_die("listen() failed.");
+		error_die("listen");
 	}
 
-	return httpd;
+	return(httpd);
 }
 
 /**********************************************************************/
