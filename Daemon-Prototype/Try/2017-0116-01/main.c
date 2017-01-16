@@ -176,7 +176,11 @@ static void accept_request(int client)
 	ZF_LOGI("Enter accept_request with client = %i", client);
 	printf("Enter accept_request with client = %d\n", client);
 
-	numchars = get_line(client, accept_buf, 1024 * sizeof(char));
+	while (numchars = get_line(client, accept_buf, 1024 * sizeof(char)) > 0)
+	{
+		ZF_LOGI("get_line: %s", accept_buf);
+		printf("get_line: %s\n", accept_buf);
+	}
 
 	ZF_LOGI("Completed accept_request with client = %i", client);
 	printf("Completed accept_request with client = %d\n", client);
