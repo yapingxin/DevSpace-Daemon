@@ -61,8 +61,8 @@ static void error_die(const char *sc);
 
 */
 
-static void handle_tcp_client(int client_sockfd);
 static void log_client_info(struct sockaddr_in * p_client_addr);
+static void accept_request(int client_sockfd);
 
 
 int main(int argc, char *argv[])
@@ -152,10 +152,38 @@ int main(int argc, char *argv[])
 
 		log_client_info(&client_addr);
 
-		handle_tcp_client(client_sockfd);
+		accept_request(client_sockfd);
 	}
 
     return 0;
+}
+
+static void accept_request(int client_sockfd)
+{
+	static char buffer[BUFSIZE] = { 0 };
+
+	size_t num_bytes_rcvd = 0;
+
+	num_bytes_rcvd = recv(client_sockfd, buffer, BUFSIZE, 0);
+	if (num_bytes_rcvd < 0)
+	{
+		error_die("recv() failed.");
+	}
+
+	/* if num_bytes_rcvd == 0 then the end of stream is reached. */
+	while (num_bytes_rcvd > 0)
+	{
+		ZF_LOGI("Recv: %s", buffer);
+		printf("Recv: %s\n", buffer);
+
+		num_bytes_rcvd = recv(client_sockfd, buffer, BUFSIZE, 0);
+		if (num_bytes_rcvd < 0)
+		{
+			error_die("recv() failed.");
+		}
+	}
+
+	close(client_sockfd);
 }
 
 static void log_client_info(struct sockaddr_in *p_client_addr)
@@ -184,34 +212,5 @@ static void error_die(const char *sc)
 
 	perror(sc);
 	exit(1);
-}
-
-
-static void handle_tcp_client(int client_sockfd)
-{
-	static char buffer[BUFSIZE] = { 0 };
-
-	size_t num_bytes_rcvd = 0;
-
-	num_bytes_rcvd = recv(client_sockfd, buffer, BUFSIZE, 0);
-	if (num_bytes_rcvd < 0)
-	{
-		error_die("recv() failed.");
-	}
-
-	/* if num_bytes_rcvd == 0 then the end of stream is reached. */
-	while (num_bytes_rcvd > 0)
-	{
-		ZF_LOGI("Recv: %s", buffer);
-		printf("Recv: %s\n", buffer);
-
-		num_bytes_rcvd = recv(client_sockfd, buffer, BUFSIZE, 0);
-		if (num_bytes_rcvd < 0)
-		{
-			error_die("recv() failed.");
-		}
-	}
-
-	close(client_sockfd);
 }
 
