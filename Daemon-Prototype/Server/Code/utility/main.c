@@ -62,6 +62,7 @@ static void error_die(const char *sc);
 */
 
 static void handle_tcp_client(int client_sockfd);
+static void log_client_info(struct sockaddr_in * p_client_addr);
 
 
 int main(int argc, char *argv[])
@@ -74,9 +75,6 @@ int main(int argc, char *argv[])
 	socklen_t client_addr_len = sizeof(struct sockaddr_in);
 	int flag;
 	int ret;
-
-	char client_name[INET_ADDRSTRLEN] = { 0 };
-	const char *ret_constxt = NULL;
 
 	file_output_open(global_log_file_path);
 
@@ -152,17 +150,24 @@ int main(int argc, char *argv[])
 			error_die("accept() failed.");
 		}
 
-		ret_constxt = inet_ntop(AF_INET, &client_addr.sin_addr.s_addr, client_name, INET_ADDRSTRLEN);
-		if (ret_constxt != NULL)
-		{
-			ZF_LOGI("Handling client %s/%i", client_name, ntohs(client_addr.sin_port));
-			printf("Handling client %s/%d\n", client_name, ntohs(client_addr.sin_port));
-		}
+		log_client_info(&client_addr);
 
 		handle_tcp_client(client_sockfd);
 	}
 
     return 0;
+}
+
+static void log_client_info(struct sockaddr_in *p_client_addr)
+{
+	static char client_name[INET_ADDRSTRLEN] = { 0 };
+
+	const char *ret_constxt = inet_ntop(AF_INET, &p_client_addr->sin_addr.s_addr, client_name, INET_ADDRSTRLEN);
+	if (ret_constxt != NULL)
+	{
+		ZF_LOGI("Handling client %s/%i", client_name, ntohs(p_client_addr->sin_port));
+		printf("Handling client %s/%d\n", client_name, ntohs(p_client_addr->sin_port));
+	}
 }
 
 
