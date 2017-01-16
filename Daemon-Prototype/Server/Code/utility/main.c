@@ -26,6 +26,7 @@
 static int startup(unsigned short *port);
 static void error_die(const char *sc);
 static void accept_request(int);
+static int get_line(int, char *, int);
 
 int main(int argc, char *argv[])
 {
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
 	unsigned short port = 8001;
 	int client_sock = -1;
 	struct sockaddr_in client_socket_addr = { 0 };
-	int client_socket_addr_len = sizeof(struct sockaddr_in);
+	socklen_t client_socket_addr_len = sizeof(struct sockaddr_in);
 	pthread_t accept_request_thread = NULL;
 
 	file_output_open(global_log_file_path);
@@ -148,6 +149,8 @@ void error_die(const char *sc)
 {
 	ZF_LOGF("%s", sc);
 
+	printf("%s\n", sc);
+
 	perror(sc);
 	exit(1);
 }
@@ -159,5 +162,69 @@ void error_die(const char *sc)
 /**********************************************************************/
 static void accept_request(int client)
 {
+	char accept_buf[1024] = { 0 };
+	size_t numchars;
+	char method[255] = { 0 };
+	char url[255] = { 0 };
+	char path[512] = { 0 };
+	size_t i, j;
+	struct stat st;
+	int cgi = 0;      /* becomes true if server decides this is a CGI
+					  * program */
+	char *query_string = NULL;
 
+	ZF_LOGI("Enter accept_request with client = %i", client);
+	printf("Enter accept_request with client = %d\n", client);
+
+	numchars = get_line(client, accept_buf, 1024 * sizeof(char));
+
+	close(client);
+}
+
+
+/**********************************************************************/
+/* Get a line from a socket, whether the line ends in a newline,
+* carriage return, or a CRLF combination.  Terminates the string read
+* with a null character.  If no newline indicator is found before the
+* end of the buffer, the string is terminated with a null.  If any of
+* the above three line terminators is read, the last character of the
+* string will be a linefeed and the string will be terminated with a
+* null character.
+* Parameters: the socket descriptor
+*             the buffer to save the data in
+*             the size of the buffer
+* Returns: the number of bytes stored (excluding null) */
+/**********************************************************************/
+int get_line(int sock, char *buf, int size)
+{
+	int i = 0;
+	char c = '\0';
+	int n;
+
+	printf("Enter get_line: size = %d\n", size);
+
+	while ((i < size - 1) && (c != '\n'))
+	{
+		n = recv(sock, &c, 1, 0);
+		/* DEBUG printf("%02X\n", c); */
+		if (n > 0)
+		{
+			if (c == '\r')
+			{
+				n = recv(sock, &c, 1, MSG_PEEK);
+				/* DEBUG printf("%02X\n", c); */
+				if ((n > 0) && (c == '\n'))
+					recv(sock, &c, 1, 0);
+				else
+					c = '\n';
+			}
+			buf[i] = c;
+			i++;
+		}
+		else
+			c = '\n';
+	}
+	buf[i] = '\0';
+
+	return(i);
 }
