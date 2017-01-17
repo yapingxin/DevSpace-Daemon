@@ -1,0 +1,17 @@
+#ifndef _UTILITY_HTTP_RESPONSE_H_
+#define _UTILITY_HTTP_RESPONSE_H_
+
+#include <stdio.h>
+
+#define SERVER_STRING "Server: Tiny HTTP Application Server/0.2.1\r\n"
+
+void headers(int, const char *);
+void bad_request(int client_sockfd);
+void cannot_execute(int client_sockfd);
+void not_found(int);
+void unimplemented(int);
+void serve_file(int, const char *);
+void cat(int, FILE *);
+void execute_cgi(int, const char *, const char *, const char *);
+
+#endif // _UTILITY_HTTP_RESPONSE_H_

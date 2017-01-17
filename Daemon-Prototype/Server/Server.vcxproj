@@ -80,12 +80,14 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="Code\lib\log\zf_log.c" />
+    <ClCompile Include="Code\utility\http_response.c" />
     <ClCompile Include="Code\utility\logfunc.c" />
     <ClCompile Include="Code\utility\main.c" />
     <ClCompile Include="Code\utility\recvlogic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\lib\log\zf_log.h" />
+    <ClInclude Include="Code\utility\http_response.h" />
     <ClInclude Include="Code\utility\logfunc.h" />
     <ClInclude Include="Code\utility\recvlogic.h" />
   </ItemGroup>
