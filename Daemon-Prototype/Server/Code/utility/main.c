@@ -10,7 +10,6 @@
 int main(int argc, char *argv[])
 {
 	int server_sockfd = -1;
-	unsigned char service_poweron = 1;
 
 	server_sockfd = startup(main_service_port);
 
@@ -33,7 +32,7 @@ int main(int argc, char *argv[])
 	ZF_LOGI("httpd running on port %i", main_service_port);
 	printf("httpd running on port %d\n\n", main_service_port);
 
-	mainloop_recv(server_sockfd, service_poweron);
+	mainloop_recv(server_sockfd);
 
 	close(server_sockfd);
 	return(0);

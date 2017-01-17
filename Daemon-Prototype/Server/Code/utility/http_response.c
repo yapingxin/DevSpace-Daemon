@@ -130,6 +130,29 @@ void unimplemented(int client_sockfd)
 	send(client_sockfd, buf, strlen(buf), 0);
 }
 
+
+void default_http_response(const int client_sockfd, const char * msg)
+{
+	static char buf[2048] = { 0 };
+
+	memset(buf, 0, 2048);
+
+	sprintf(buf, "HTTP/1.0 200 OK\r\n");
+	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(buf, SERVER_STRING);
+	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(buf, "Content-Type: text/html\r\n");
+	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(buf, "\r\n");
+	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(buf, "<HTML><HEAD><TITLE>HTTP Response | client_sockfd = 0x08X </TITLE></HEAD>\r\n", client_sockfd);
+	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(buf, "<BODY><h1>Your request:</h1><hr /><pre>%s</pre><hr />\r\n", msg);
+	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(buf, "</BODY></HTML>\r\n");
+	send(client_sockfd, buf, strlen(buf), 0);
+}
+
 /**********************************************************************/
 /* Send a regular file to the client.  Use headers, and report
 * errors to client if they occur.
