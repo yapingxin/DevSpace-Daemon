@@ -83,7 +83,7 @@
     <ClCompile Include="Code\utility\http_response.c" />
     <ClCompile Include="Code\utility\logfunc.c" />
     <ClCompile Include="Code\utility\main.c" />
-    <ClCompile Include="Code\utility\recvlogic.cpp" />
+    <ClCompile Include="Code\utility\recvlogic.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\lib\log\zf_log.h" />

@@ -10,10 +10,10 @@
     <ClCompile Include="Code\utility\logfunc.c">
       <Filter>utility</Filter>
     </ClCompile>
-    <ClCompile Include="Code\utility\recvlogic.cpp">
+    <ClCompile Include="Code\utility\http_response.c">
       <Filter>utility</Filter>
     </ClCompile>
-    <ClCompile Include="Code\utility\http_response.c">
+    <ClCompile Include="Code\utility\recvlogic.c">
       <Filter>utility</Filter>
     </ClCompile>
   </ItemGroup>
