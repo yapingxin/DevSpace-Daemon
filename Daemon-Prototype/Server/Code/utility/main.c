@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
 	unsigned char service_poweron = 1;
 
 	server_sockfd = startup(main_service_port);
-	printf("httpd running on port %d\n", main_service_port);
 
 	file_output_open(global_log_file_path);
 
@@ -23,6 +22,16 @@ int main(int argc, char *argv[])
 	ZF_LOGI("**       Tiny HTTP Application Server Start        **");
 	ZF_LOGI("*****************************************************");
 	ZF_LOGI("");
+
+	printf("\n");
+	printf("\n");
+	printf("*****************************************************\n");
+	printf("**       Tiny HTTP Application Server Start        **\n");
+	printf("*****************************************************\n");
+	printf("\n");
+
+	ZF_LOGI("httpd running on port %i", main_service_port);
+	printf("httpd running on port %d\n\n", main_service_port);
 
 	mainloop_recv(server_sockfd, service_poweron);
 

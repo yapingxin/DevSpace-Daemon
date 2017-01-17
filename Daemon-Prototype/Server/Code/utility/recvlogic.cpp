@@ -22,6 +22,8 @@
 
 #define ISspace(x) isspace((int)(x))
 
+static void accept_request(const int client_sockfd);
+
 
 int startup(unsigned short port)
 {
@@ -31,7 +33,7 @@ int startup(unsigned short port)
 	httpd = socket(PF_INET, SOCK_STREAM, 0);
 	if (httpd == -1)
 	{
-		error_die("socket");
+		error_die("socket() failed.");
 	}
 
 	memset(&sock_addr, 0, sizeof(struct sockaddr_in));
@@ -41,14 +43,47 @@ int startup(unsigned short port)
 
 	if (bind(httpd, (struct sockaddr *)&sock_addr, sizeof(struct sockaddr_in)) < 0)
 	{
-		error_die("bind");
+		error_die("bind() failed.");
 	}
 	
 	if (listen(httpd, 5) < 0)
-		error_die("listen");
+	{
+		error_die("listen() failed.");
+	}
+
 	return(httpd);
 }
 
+
+void error_die(const char *msg)
+{
+	perror(msg);
+	exit(1);
+}
+
+
+void mainloop_recv(const int server_sockfd, const unsigned char service_poweron)
+{
+	int client_sockfd = -1;
+	int client_addr_len = sizeof(struct sockaddr_in);
+	struct sockaddr_in client_addr = { 0 };
+	pthread_t request_thread = NULL;
+
+	while (service_poweron)
+	{
+		client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_addr, &client_addr_len);
+		if (client_sockfd == -1)
+		{
+			error_die("accept");
+		}
+
+		/* accept_request(client_sockfd); */
+		if (pthread_create(&request_thread, NULL, accept_request, client_sockfd) != 0)
+		{
+			perror("pthread_create");
+		}
+	}
+}
 
 int get_line(const int sockfd, char *buf, const int buf_size)
 {
@@ -83,14 +118,7 @@ int get_line(const int sockfd, char *buf, const int buf_size)
 }
 
 
-void error_die(const char *msg)
-{
-	perror(msg);
-	exit(1);
-}
-
-
-void accept_request(const int client_sockfd)
+static void accept_request(const int client_sockfd)
 {
 	char buf[1024];
 	int numchars;
@@ -170,26 +198,3 @@ void accept_request(const int client_sockfd)
 	close(client_sockfd);
 }
 
-
-void mainloop_recv(const int server_sockfd, const unsigned char service_poweron)
-{
-	int client_sockfd = -1;
-	int client_addr_len = sizeof(struct sockaddr_in);
-	struct sockaddr_in client_addr = { 0 };
-	pthread_t request_thread = NULL;
-
-	while (service_poweron)
-	{
-		client_sockfd = accept(server_sockfd, (struct sockaddr *)&client_addr, &client_addr_len);
-		if (client_sockfd == -1)
-		{
-			error_die("accept");
-		}
-
-		/* accept_request(client_sockfd); */
-		if (pthread_create(&request_thread, NULL, accept_request, client_sockfd) != 0)
-		{
-			perror("pthread_create");
-		}
-	}
-}
