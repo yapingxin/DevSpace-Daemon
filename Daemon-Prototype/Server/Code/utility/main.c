@@ -15,7 +15,7 @@
 #include <pthread.h>
 #include <sys/wait.h>
 #include <stdlib.h>
-
+#include <signal.h>
 #include <inttypes.h>
 
 #define MAXPENDING 5
@@ -57,6 +57,10 @@
 
 */
 
+static int child_process_count = 0;
+
+void sig_child(int signo);
+
 
 int main(int argc, char *argv[])
 {
@@ -68,6 +72,8 @@ int main(int argc, char *argv[])
 	socklen_t client_addr_len = sizeof(struct sockaddr_in);
 	
 	int ret;
+
+	pid_t childpid;
 
 	file_output_open(global_log_file_path);
 
@@ -130,6 +136,8 @@ int main(int argc, char *argv[])
 	ZF_LOGI("Server is ruinning.");
 	printf("Server is ruinning.\n");
 
+	//signal(SIGCHLD, sig_child);
+
 	while (1)
 	{
 		memset(&client_addr, 0, sizeof(struct sockaddr_in));
@@ -139,11 +147,73 @@ int main(int argc, char *argv[])
 			error_die("accept() failed.");
 		}
 
-		log_client_info(&client_addr);
+		if ((childpid = fork()) == 0)
+		{
+			// child process
 
-		accept_request(client_sockfd);
+			close(server_sockfd);
+
+			log_client_info(&client_addr);
+			accept_request(client_sockfd);
+
+			exit(0);
+		}
+		else if (childpid < 0)
+		{
+			error_die("fork() failed.");
+		}
+		else
+		{
+			// parent process
+
+			// Do not count in child process :: begin
+			//child_process_count++;
+			//ZF_LOGI("[mainloop] child_process_count: %i", child_process_count);
+			//printf("[mainloop] child_process_count: %d\n", child_process_count);
+			// Do not count in child process :: end
+
+			close(client_sockfd);
+		}
 	}
 
     return 0;
 }
 
+void sig_child(int signo)
+{
+	pid_t pid = 0;
+	int status = 0;
+
+	ZF_LOGI("sig_child entering.");
+	printf("sig_child entering.\n");
+
+	
+	//while ((pid = waitpid(-1, &status, WNOHANG)) > 0);
+	//while ((pid = waitpid(-1, NULL, WNOHANG)) > 0);
+
+	switch (signo)
+	{
+	case SIGCHLD:
+		signal(SIGCHLD, sig_child);
+		while ((pid = waitpid(-1, &status, WNOHANG)) > 0)
+		{
+			child_process_count--;
+			ZF_LOGI("[sig_child] child_process_count: %i", child_process_count);
+			printf("[sig_child] child_process_count: %d\n", child_process_count);
+		}
+
+		signal(signo, sig_child);
+		ZF_LOGI("[sig_child] signal re-add");
+		printf("[sig_child] signal re-add\n");
+
+		break;
+	case SIGTSTP:
+		exit(0);
+		break;
+	}
+
+	ZF_LOGI("Client exit.");
+	printf("Client exit.\n");
+	
+	return;
+}

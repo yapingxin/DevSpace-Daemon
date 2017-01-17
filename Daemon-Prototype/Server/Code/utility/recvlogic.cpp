@@ -36,6 +36,7 @@ void accept_request(int client_sockfd)
 	static char buffer[BUFSIZE] = { 0 };
 
 	size_t num_bytes_rcvd = 0;
+	char* msgBack = "recv() executed.";
 
 	num_bytes_rcvd = recv(client_sockfd, buffer, BUFSIZE, 0);
 	if (num_bytes_rcvd < 0)
@@ -55,6 +56,8 @@ void accept_request(int client_sockfd)
 			error_die("recv() failed.");
 		}
 	}
+
+	//send(client_sockfd, msgBack, strlen(msgBack), 0);
 
 	close(client_sockfd);
 }
