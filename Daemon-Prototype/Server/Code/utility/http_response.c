@@ -145,7 +145,7 @@ void default_http_response(const int client_sockfd, const char * msg)
 	send(client_sockfd, buf, strlen(buf), 0);
 	sprintf(buf, "\r\n");
 	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "<HTML><HEAD><TITLE>HTTP Response | client_sockfd = 0x08X </TITLE></HEAD>\r\n", client_sockfd);
+	sprintf(buf, "<HTML><HEAD><TITLE>HTTP Response | client_sockfd = 0x%08X </TITLE></HEAD>\r\n", client_sockfd);
 	send(client_sockfd, buf, strlen(buf), 0);
 	sprintf(buf, "<BODY><h1>Your request:</h1><hr /><pre>%s</pre><hr />\r\n", msg);
 	send(client_sockfd, buf, strlen(buf), 0);
