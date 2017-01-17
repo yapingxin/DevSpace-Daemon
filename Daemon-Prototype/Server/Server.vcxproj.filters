@@ -41,5 +41,8 @@
     <ClInclude Include="Code\utility\http_response.h">
       <Filter>utility</Filter>
     </ClInclude>
+    <ClInclude Include="Code\utility\service_config.h">
+      <Filter>utility</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -90,6 +90,7 @@
     <ClInclude Include="Code\utility\http_response.h" />
     <ClInclude Include="Code\utility\logfunc.h" />
     <ClInclude Include="Code\utility\recvlogic.h" />
+    <ClInclude Include="Code\utility\service_config.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
