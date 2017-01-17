@@ -17,12 +17,14 @@
 #include <inttypes.h>
 #include <linux/tcp.h> /* #define TCP_NODELAY 1 */
 
+#include "service_config.h"
 #include "recvlogic.h"
 #include "logfunc.h"
 
 #define ISspace(x) isspace((int)(x))
 
 static void accept_request(const int client_sockfd);
+static void log_client_info(struct sockaddr_in *p_client_addr);
 
 
 int startup(unsigned short port)
@@ -77,6 +79,8 @@ void mainloop_recv(const int server_sockfd, const unsigned char service_poweron)
 			error_die("accept");
 		}
 
+		log_client_info(&client_addr);
+
 		/* accept_request(client_sockfd); */
 		if (pthread_create(&request_thread, NULL, accept_request, client_sockfd) != 0)
 		{
@@ -120,23 +124,33 @@ int get_line(const int sockfd, char *buf, const int buf_size)
 
 static void accept_request(const int client_sockfd)
 {
-	char buf[1024];
+	static char buf[accept_line_buf_size] = { 0 };
+	static char method[accept_method_buf_size] = { 0 };
+	static char url[accept_url_buf_size] = { 0 };
+	static char path[accept_path_buf_size];
+
 	int numchars;
-	char method[255];
-	char url[255];
-	char path[512];
 	size_t i, j;
 	struct stat status;
-	int cgi = 0;      /* becomes true if server decides this is a CGI
-					  * program */
 	char *query_string = NULL;
 
+	/* becomes true if server decides this is a CGI program */
+	int cgi = 0;
+
+	memset(buf, 0, accept_line_buf_size);
+	memset(method, 0, accept_method_buf_size);
+	memset(url, 0, accept_url_buf_size);
+	memset(path, 0, accept_path_buf_size);
+
 	numchars = get_line(client_sockfd, buf, sizeof(buf));
-	i = 0; j = 0;
+	i = 0;
+	j = 0;
+	
 	while (!ISspace(buf[j]) && (i < sizeof(method) - 1))
 	{
 		method[i] = buf[j];
-		i++; j++;
+		i++;
+		j++;
 	}
 	method[i] = '\0';
 
@@ -157,13 +171,17 @@ static void accept_request(const int client_sockfd)
 		url[i] = buf[j];
 		i++; j++;
 	}
+
 	url[i] = '\0';
 
 	if (strcasecmp(method, "GET") == 0)
 	{
 		query_string = url;
 		while ((*query_string != '?') && (*query_string != '\0'))
+		{
 			query_string++;
+		}
+		
 		if (*query_string == '?')
 		{
 			cgi = 1;
@@ -175,9 +193,14 @@ static void accept_request(const int client_sockfd)
 	sprintf(path, "htdocs%s", url);
 	if (path[strlen(path) - 1] == '/')
 		strcat(path, "index.html");
-	if (stat(path, &status) == -1) {
-		while ((numchars > 0) && strcmp("\n", buf))  /* read & discard headers */
+	if (stat(path, &status) == -1)
+	{
+		// read & discard headers
+		while ((numchars > 0) && strcmp("\n", buf))
+		{
 			numchars = get_line(client_sockfd, buf, sizeof(buf));
+		}
+		
 		not_found(client_sockfd);
 	}
 	else
@@ -198,3 +221,14 @@ static void accept_request(const int client_sockfd)
 	close(client_sockfd);
 }
 
+static void log_client_info(struct sockaddr_in *p_client_addr)
+{
+	static char client_name[INET_ADDRSTRLEN] = { 0 };
+
+	const char *ret_constxt = inet_ntop(AF_INET, &p_client_addr->sin_addr.s_addr, client_name, INET_ADDRSTRLEN);
+	if (ret_constxt != NULL)
+	{
+		ZF_LOGI("Handling client %s/%i", client_name, ntohs(p_client_addr->sin_port));
+		//printf("Handling client %s/%d\n", client_name, ntohs(p_client_addr->sin_port));
+	}
+}

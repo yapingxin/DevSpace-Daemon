@@ -12,6 +12,6 @@ void not_found(int);
 void unimplemented(int);
 void serve_file(int, const char *);
 void cat(int, FILE *);
-void execute_cgi(int, const char *, const char *, const char *);
+void execute_cgi(const int, const char *, const char *, const char *);
 
 #endif // _UTILITY_HTTP_RESPONSE_H_

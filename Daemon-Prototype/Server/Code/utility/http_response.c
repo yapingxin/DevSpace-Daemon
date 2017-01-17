@@ -183,8 +183,7 @@ void cat(int client_sockfd, FILE *resource)
 * Parameters: client socket descriptor
 *             path to the CGI script */
 /**********************************************************************/
-void execute_cgi(int client_sockfd, const char *path,
-	const char *method, const char *query_string)
+void execute_cgi(const int client_sockfd, const char *path, const char *method, const char *query_string)
 {
 	char buf[1024];
 	int cgi_output[2];
