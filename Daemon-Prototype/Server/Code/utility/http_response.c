@@ -17,26 +17,14 @@
 #include "service_config.h"
 #define ISspace(x) isspace((int)(x))
 
+static void headers(int client_sockfd, const char *filename);
 
-/**********************************************************************/
-/* Return the informational HTTP headers about a file. */
-/* Parameters: the socket to print the headers on
-*             the name of the file */
-/**********************************************************************/
-void headers(int client_sockfd, const char *filename)
-{
-	char buf[1024];
-	(void)filename;  /* could use filename to determine file type */
 
-	strcpy(buf, "HTTP/1.0 200 OK\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	strcpy(buf, SERVER_STRING);
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "Content-Type: text/html\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	strcpy(buf, "\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-}
+static char outbuf[out_to_browser_buf_size] = { 0 };
+static char method[accept_method_buf_size] = { 0 };
+static char url[accept_url_buf_size] = { 0 };
+static char protocol[accept_protocol_buf_size] = { 0 };
+
 
 /**********************************************************************/
 /* Inform the client that a request it has made has a problem.
@@ -44,18 +32,18 @@ void headers(int client_sockfd, const char *filename)
 /**********************************************************************/
 void bad_request(int client_sockfd)
 {
-	char buf[1024];
+	memset(outbuf, 0, out_to_browser_buf_size);
 
-	sprintf(buf, "HTTP/1.0 400 BAD REQUEST\r\n");
-	send(client_sockfd, buf, sizeof(buf), 0);
-	sprintf(buf, "Content-type: text/html\r\n");
-	send(client_sockfd, buf, sizeof(buf), 0);
-	sprintf(buf, "\r\n");
-	send(client_sockfd, buf, sizeof(buf), 0);
-	sprintf(buf, "<P>Your browser sent a bad request, ");
-	send(client_sockfd, buf, sizeof(buf), 0);
-	sprintf(buf, "such as a POST without a Content-Length.\r\n");
-	send(client_sockfd, buf, sizeof(buf), 0);
+	sprintf(outbuf, "HTTP/1.0 400 BAD REQUEST\r\n");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
+	sprintf(outbuf, "Content-type: text/html\r\n");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
+	sprintf(outbuf, "\r\n");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
+	sprintf(outbuf, "<P>Your browser sent a bad request, ");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
+	sprintf(outbuf, "such as a POST without a Content-Length.\r\n");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
 }
 
 
@@ -65,16 +53,16 @@ void bad_request(int client_sockfd)
 /**********************************************************************/
 void cannot_execute(int client_sockfd)
 {
-	char buf[1024];
+	memset(outbuf, 0, out_to_browser_buf_size);
 
-	sprintf(buf, "HTTP/1.0 500 Internal Server Error\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "Content-type: text/html\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "<P>Error prohibited CGI execution.\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(outbuf, "HTTP/1.0 500 Internal Server Error\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "Content-type: text/html\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<P>Error prohibited CGI execution.\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
 }
 
 
@@ -83,26 +71,26 @@ void cannot_execute(int client_sockfd)
 /**********************************************************************/
 void not_found(int client_sockfd)
 {
-	char buf[1024];
+	memset(outbuf, 0, out_to_browser_buf_size);
 
-	sprintf(buf, "HTTP/1.0 404 NOT FOUND\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, SERVER_STRING);
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "Content-Type: text/html\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "<HTML><TITLE>Not Found</TITLE>\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "<BODY><P>The server could not fulfill\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "your request because the resource specified\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "is unavailable or nonexistent.\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "</BODY></HTML>\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(outbuf, "HTTP/1.0 404 NOT FOUND\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, SERVER_STRING);
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "Content-Type: text/html\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<HTML><TITLE>Not Found</TITLE>\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<BODY><P>The server could not fulfill\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "your request because the resource specified\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "is unavailable or nonexistent.\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "</BODY></HTML>\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
 }
 
 
@@ -113,38 +101,33 @@ void not_found(int client_sockfd)
 /**********************************************************************/
 void unimplemented(int client_sockfd)
 {
-	char buf[1024];
+	memset(outbuf, 0, out_to_browser_buf_size);
 
-	sprintf(buf, "HTTP/1.0 501 Method Not Implemented\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, SERVER_STRING);
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "Content-Type: text/html\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "<HTML><HEAD><TITLE>Method Not Implemented\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "</TITLE></HEAD>\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "<BODY><P>HTTP request method not supported.\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "</BODY></HTML>\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(outbuf, "HTTP/1.0 501 Method Not Implemented\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, SERVER_STRING);
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "Content-Type: text/html\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<HTML><HEAD><TITLE>Method Not Implemented\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "</TITLE></HEAD>\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<BODY><P>HTTP request method not supported.\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "</BODY></HTML>\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
 }
 
 
 void default_http_response(const int client_sockfd, const char * msg)
 {
-	static char buf[2048] = { 0 };
-	static char method[accept_method_buf_size] = { 0 };
-	static char url[accept_url_buf_size] = { 0 };
-	static char protocol[accept_protocol_buf_size] = { 0 };
-
 	size_t i = 0;
 	size_t j = 0;
 
-	memset(buf, 0, 2048);
+	memset(outbuf, 0, out_to_browser_buf_size);
 	memset(method, 0, accept_method_buf_size);
 	memset(url, 0, accept_url_buf_size);
 	memset(protocol, 0, accept_protocol_buf_size);
@@ -190,20 +173,20 @@ void default_http_response(const int client_sockfd, const char * msg)
 		}
 	}
 
-	sprintf(buf, "HTTP/1.0 200 OK\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, SERVER_STRING);
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "Content-Type: text/html\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "<HTML><HEAD><TITLE>HTTP Response | client_sockfd = 0x%08X </TITLE></HEAD>\r\n", client_sockfd);
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "<BODY><h1>Your request:</h1><hr /><p> Method: %s <br /> URL: %s <br /> protocol: %s </p><pre>%s</pre><hr />\r\n", method, url, protocol, msg);
-	send(client_sockfd, buf, strlen(buf), 0);
-	sprintf(buf, "</BODY></HTML>\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(outbuf, "HTTP/1.0 200 OK\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, SERVER_STRING);
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "Content-Type: text/html\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<HTML><HEAD><TITLE>HTTP Response | client_sockfd = 0x%08X </TITLE></HEAD>\r\n", client_sockfd);
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<BODY><h1>Your request:</h1><hr /><p> Method: %s <br /> URL: %s <br /> protocol: %s </p><pre>%s</pre><hr />\r\n", method, url, protocol, msg);
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "</BODY></HTML>\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
 }
 
 /**********************************************************************/
@@ -217,11 +200,12 @@ void serve_file(int client_sockfd, const char *filename)
 {
 	FILE *resource = NULL;
 	int numchars = 1;
-	char buf[1024];
+	
+	memset(outbuf, 0, out_to_browser_buf_size);
 
-	buf[0] = 'A'; buf[1] = '\0';
-	while ((numchars > 0) && strcmp("\n", buf))  /* read & discard headers */
-		numchars = get_line(client_sockfd, buf, sizeof(buf));
+	outbuf[0] = 'A'; outbuf[1] = '\0';
+	while ((numchars > 0) && strcmp("\n", outbuf))  /* read & discard headers */
+		numchars = get_line(client_sockfd, outbuf, sizeof(outbuf));
 
 	resource = fopen(filename, "r");
 	if (resource == NULL)
@@ -243,13 +227,13 @@ void serve_file(int client_sockfd, const char *filename)
 /**********************************************************************/
 void cat(int client_sockfd, FILE *resource)
 {
-	char buf[1024];
+	memset(outbuf, 0, out_to_browser_buf_size);
 
-	fgets(buf, sizeof(buf), resource);
+	fgets(outbuf, sizeof(outbuf), resource);
 	while (!feof(resource))
 	{
-		send(client_sockfd, buf, strlen(buf), 0);
-		fgets(buf, sizeof(buf), resource);
+		send(client_sockfd, outbuf, strlen(outbuf), 0);
+		fgets(outbuf, sizeof(outbuf), resource);
 	}
 }
 
@@ -261,7 +245,6 @@ void cat(int client_sockfd, FILE *resource)
 /**********************************************************************/
 void execute_cgi(const int client_sockfd, const char *path, const char *method, const char *query_string)
 {
-	char buf[1024];
 	int cgi_output[2];
 	int cgi_input[2];
 	pid_t pid;
@@ -271,19 +254,21 @@ void execute_cgi(const int client_sockfd, const char *path, const char *method, 
 	int numchars = 1;
 	int content_length = -1;
 
-	buf[0] = 'A'; buf[1] = '\0';
+	memset(outbuf, 0, out_to_browser_buf_size);
+
+	outbuf[0] = 'A'; outbuf[1] = '\0';
 	if (strcasecmp(method, "GET") == 0)
-		while ((numchars > 0) && strcmp("\n", buf))  /* read & discard headers */
-			numchars = get_line(client_sockfd, buf, sizeof(buf));
+		while ((numchars > 0) && strcmp("\n", outbuf))  /* read & discard headers */
+			numchars = get_line(client_sockfd, outbuf, sizeof(outbuf));
 	else    /* POST */
 	{
-		numchars = get_line(client_sockfd, buf, sizeof(buf));
-		while ((numchars > 0) && strcmp("\n", buf))
+		numchars = get_line(client_sockfd, outbuf, sizeof(outbuf));
+		while ((numchars > 0) && strcmp("\n", outbuf))
 		{
-			buf[15] = '\0';
-			if (strcasecmp(buf, "Content-Length:") == 0)
-				content_length = atoi(&(buf[16]));
-			numchars = get_line(client_sockfd, buf, sizeof(buf));
+			outbuf[15] = '\0';
+			if (strcasecmp(outbuf, "Content-Length:") == 0)
+				content_length = atoi(&(outbuf[16]));
+			numchars = get_line(client_sockfd, outbuf, sizeof(outbuf));
 		}
 		if (content_length == -1) {
 			bad_request(client_sockfd);
@@ -291,8 +276,8 @@ void execute_cgi(const int client_sockfd, const char *path, const char *method, 
 		}
 	}
 
-	sprintf(buf, "HTTP/1.0 200 OK\r\n");
-	send(client_sockfd, buf, strlen(buf), 0);
+	sprintf(outbuf, "HTTP/1.0 200 OK\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
 
 	if (pipe(cgi_output) < 0) {
 		cannot_execute(client_sockfd);
@@ -346,3 +331,26 @@ void execute_cgi(const int client_sockfd, const char *path, const char *method, 
 		waitpid(pid, &status, 0);
 	}
 }
+
+
+/**********************************************************************/
+/* Return the informational HTTP headers about a file. */
+/* Parameters: the socket to print the headers on
+*             the name of the file */
+/**********************************************************************/
+static void headers(int client_sockfd, const char *filename)
+{
+	(void)filename;  /* could use filename to determine file type */
+
+	memset(outbuf, 0, out_to_browser_buf_size);
+
+	strcpy(outbuf, "HTTP/1.0 200 OK\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	strcpy(outbuf, SERVER_STRING);
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "Content-Type: text/html\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	strcpy(outbuf, "\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+}
+

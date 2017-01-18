@@ -10,5 +10,6 @@
 #define accept_url_buf_size		 255
 #define accept_path_buf_size	 512
 #define accept_protocol_buf_size 16
+#define out_to_browser_buf_size	 2048
 
 #endif // _UTILITY_SERVICE_CONFIG_H_

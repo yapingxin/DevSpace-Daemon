@@ -5,7 +5,6 @@
 
 #define SERVER_STRING "Server: Tiny HTTP Application Server/0.2.1\r\n"
 
-void headers(int, const char *);
 void bad_request(int client_sockfd);
 void cannot_execute(int client_sockfd);
 void not_found(int);
