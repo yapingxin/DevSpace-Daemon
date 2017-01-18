@@ -22,8 +22,6 @@
 #include "recvlogic.h"
 #include "logfunc.h"
 
-#define ISspace(x) isspace((int)(x))
-
 static void accept_request(const int client_sockfd);
 static void log_client_info(struct sockaddr_in *p_client_addr);
 
@@ -131,9 +129,13 @@ int get_line(const int sockfd, char *buf, const int buf_size)
 			{
 				count = recv(sockfd, &c, 1, MSG_PEEK);
 				if ((count > 0) && (c == '\n'))
+				{
 					recv(sockfd, &c, 1, 0);
+				}
 				else
+				{
 					c = '\n';
+				}
 			}
 			buf[i] = c;
 			i++;
