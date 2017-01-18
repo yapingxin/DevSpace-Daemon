@@ -5,10 +5,9 @@
 
 #define global_log_file_path	"/home/yapingxin/DevSpace/log/Daemon-Prototype/Server.log"
 
-#define accept_line_buf_size	 1024
-#define accept_method_buf_size	 16
-#define accept_url_buf_size		 255
-#define accept_path_buf_size	 512
-#define accept_protocol_buf_size 16
+#define accept_line_buf_size	1024
+#define accept_method_buf_size	16
+#define accept_url_buf_size		255
+#define accept_path_buf_size	512
 
 #endif // _UTILITY_SERVICE_CONFIG_H_

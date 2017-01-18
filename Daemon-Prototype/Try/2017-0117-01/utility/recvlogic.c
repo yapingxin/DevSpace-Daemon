@@ -148,6 +148,121 @@ int get_line(const int sockfd, char *buf, const int buf_size)
 	return(i);
 }
 
+/*
+static void accept_request(const int client_sockfd)
+{
+	static char buf[accept_line_buf_size] = { 0 };
+	static char method[accept_method_buf_size] = { 0 };
+	static char url[accept_url_buf_size] = { 0 };
+	static char path[accept_path_buf_size];
+
+	int numchars;
+	size_t i, j;
+	struct stat status;
+	char *query_string = NULL;
+
+	// becomes true if server decides this is a CGI program
+	int cgi = 0;
+
+	memset(buf, 0, accept_line_buf_size);
+	memset(method, 0, accept_method_buf_size);
+	memset(url, 0, accept_url_buf_size);
+	memset(path, 0, accept_path_buf_size);
+
+	numchars = get_line(client_sockfd, buf, sizeof(buf));
+	i = 0;
+	j = 0;
+
+	ZF_LOGI("recv buf: %s", buf);
+	printf("recv buf: %s\n", buf);
+
+	if (strcmp(buf, "Cmd: QUIT") == 0)
+	{
+		ZF_LOGI("Cmd: QUIT ==> Program Exit.");
+		printf("Cmd: QUIT ==> Program Exit.\n");
+
+		close(client_sockfd);
+		g_service_poweron = 0;
+
+		wait(3000);
+		return;
+	}
+	
+	while (!ISspace(buf[j]) && (i < sizeof(method) - 1))
+	{
+		method[i] = buf[j];
+		i++;
+		j++;
+	}
+	method[i] = '\0';
+
+	if (strcasecmp(method, "GET") && strcasecmp(method, "POST"))
+	{
+		unimplemented(client_sockfd);
+		return;
+	}
+
+	if (strcasecmp(method, "POST") == 0)
+		cgi = 1;
+
+	i = 0;
+	while (ISspace(buf[j]) && (j < sizeof(buf)))
+		j++;
+	while (!ISspace(buf[j]) && (i < sizeof(url) - 1) && (j < sizeof(buf)))
+	{
+		url[i] = buf[j];
+		i++; j++;
+	}
+
+	url[i] = '\0';
+
+	if (strcasecmp(method, "GET") == 0)
+	{
+		query_string = url;
+		while ((*query_string != '?') && (*query_string != '\0'))
+		{
+			query_string++;
+		}
+		
+		if (*query_string == '?')
+		{
+			cgi = 1;
+			*query_string = '\0';
+			query_string++;
+		}
+	}
+
+	sprintf(path, "htdocs%s", url);
+	if (path[strlen(path) - 1] == '/')
+		strcat(path, "index.html");
+	if (stat(path, &status) == -1)
+	{
+		// read & discard headers
+		while ((numchars > 0) && strcmp("\n", buf))
+		{
+			numchars = get_line(client_sockfd, buf, sizeof(buf));
+		}
+		
+		not_found(client_sockfd);
+	}
+	else
+	{
+		//if ((st.st_mode & S_IFMT) == S_IFDIR)
+		if (S_ISDIR(status.st_mode))
+			strcat(path, "/index.html");
+		if ((status.st_mode & S_IXUSR) ||
+			(status.st_mode & S_IXGRP) ||
+			(status.st_mode & S_IXOTH))
+			cgi = 1;
+		if (!cgi)
+			serve_file(client_sockfd, path);
+		else
+			execute_cgi(client_sockfd, path, method, query_string);
+	}
+
+	close(client_sockfd);
+}
+*/
 
 static void accept_request(const int client_sockfd)
 {
@@ -161,6 +276,11 @@ static void accept_request(const int client_sockfd)
 	struct stat status;
 	char *query_string = NULL;
 	size_t num_bytes_rcvd = 0;
+
+	
+
+	/* becomes true if server decides this is a CGI program */
+	int cgi = 0;
 
 	memset(buf, 0, accept_line_buf_size);
 	memset(method, 0, accept_method_buf_size);
@@ -191,6 +311,99 @@ static void accept_request(const int client_sockfd)
 	strcat(buf, method);
 
 	default_http_response(client_sockfd, buf);
+
+	/*
+	numchars = get_line(client_sockfd, buf, sizeof(buf));
+	i = 0;
+	j = 0;
+
+	ZF_LOGI("recv buf: %s", buf);
+	printf("recv buf: %s\n", buf);
+
+	if (strcmp(buf, "Cmd: QUIT") == 0)
+	{
+		ZF_LOGI("Cmd: QUIT ==> Program Exit.");
+		printf("Cmd: QUIT ==> Program Exit.\n");
+
+		close(client_sockfd);
+		g_service_poweron = 0;
+
+		wait(3000);
+		return;
+	}
+
+	while (!ISspace(buf[j]) && (i < sizeof(method) - 1))
+	{
+		method[i] = buf[j];
+		i++;
+		j++;
+	}
+	method[i] = '\0';
+
+	if (strcasecmp(method, "GET") && strcasecmp(method, "POST"))
+	{
+		unimplemented(client_sockfd);
+		return;
+	}
+
+	if (strcasecmp(method, "POST") == 0)
+		cgi = 1;
+
+	i = 0;
+	while (ISspace(buf[j]) && (j < sizeof(buf)))
+		j++;
+	while (!ISspace(buf[j]) && (i < sizeof(url) - 1) && (j < sizeof(buf)))
+	{
+		url[i] = buf[j];
+		i++; j++;
+	}
+
+	url[i] = '\0';
+
+	if (strcasecmp(method, "GET") == 0)
+	{
+		query_string = url;
+		while ((*query_string != '?') && (*query_string != '\0'))
+		{
+			query_string++;
+		}
+
+		if (*query_string == '?')
+		{
+			cgi = 1;
+			*query_string = '\0';
+			query_string++;
+		}
+	}
+
+	sprintf(path, "htdocs%s", url);
+	if (path[strlen(path) - 1] == '/')
+		strcat(path, "index.html");
+	if (stat(path, &status) == -1)
+	{
+		// read & discard headers
+		while ((numchars > 0) && strcmp("\n", buf))
+		{
+			numchars = get_line(client_sockfd, buf, sizeof(buf));
+		}
+
+		not_found(client_sockfd);
+	}
+	else
+	{
+		//if ((st.st_mode & S_IFMT) == S_IFDIR)
+		if (S_ISDIR(status.st_mode))
+			strcat(path, "/index.html");
+		if ((status.st_mode & S_IXUSR) ||
+			(status.st_mode & S_IXGRP) ||
+			(status.st_mode & S_IXOTH))
+			cgi = 1;
+		if (!cgi)
+			serve_file(client_sockfd, path);
+		else
+			execute_cgi(client_sockfd, path, method, query_string);
+	}
+	*/
 
 	close(client_sockfd);
 }
