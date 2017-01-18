@@ -18,6 +18,9 @@
 #define ISspace(x) isspace((int)(x))
 
 static void headers(int client_sockfd, const char *filename);
+static void bad_request(int client_sockfd);
+static void cannot_execute(int client_sockfd);
+static void not_found(int client_sockfd);
 
 
 static char outbuf[out_to_browser_buf_size] = { 0 };
@@ -26,72 +29,6 @@ static char url[accept_url_buf_size] = { 0 };
 static char protocol[accept_protocol_buf_size] = { 0 };
 
 
-/**********************************************************************/
-/* Inform the client that a request it has made has a problem.
-* Parameters: client socket */
-/**********************************************************************/
-void bad_request(int client_sockfd)
-{
-	memset(outbuf, 0, out_to_browser_buf_size);
-
-	sprintf(outbuf, "HTTP/1.0 400 BAD REQUEST\r\n");
-	send(client_sockfd, outbuf, sizeof(outbuf), 0);
-	sprintf(outbuf, "Content-type: text/html\r\n");
-	send(client_sockfd, outbuf, sizeof(outbuf), 0);
-	sprintf(outbuf, "\r\n");
-	send(client_sockfd, outbuf, sizeof(outbuf), 0);
-	sprintf(outbuf, "<P>Your browser sent a bad request, ");
-	send(client_sockfd, outbuf, sizeof(outbuf), 0);
-	sprintf(outbuf, "such as a POST without a Content-Length.\r\n");
-	send(client_sockfd, outbuf, sizeof(outbuf), 0);
-}
-
-
-/**********************************************************************/
-/* Inform the client that a CGI script could not be executed.
-* Parameter: the client socket descriptor. */
-/**********************************************************************/
-void cannot_execute(int client_sockfd)
-{
-	memset(outbuf, 0, out_to_browser_buf_size);
-
-	sprintf(outbuf, "HTTP/1.0 500 Internal Server Error\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "Content-type: text/html\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "<P>Error prohibited CGI execution.\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-}
-
-
-/**********************************************************************/
-/* Give a client a 404 not found status message. */
-/**********************************************************************/
-void not_found(int client_sockfd)
-{
-	memset(outbuf, 0, out_to_browser_buf_size);
-
-	sprintf(outbuf, "HTTP/1.0 404 NOT FOUND\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, SERVER_STRING);
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "Content-Type: text/html\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "<HTML><TITLE>Not Found</TITLE>\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "<BODY><P>The server could not fulfill\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "your request because the resource specified\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "is unavailable or nonexistent.\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-	sprintf(outbuf, "</BODY></HTML>\r\n");
-	send(client_sockfd, outbuf, strlen(outbuf), 0);
-}
 
 
 /**********************************************************************/
@@ -354,3 +291,67 @@ static void headers(int client_sockfd, const char *filename)
 	send(client_sockfd, outbuf, strlen(outbuf), 0);
 }
 
+/**********************************************************************/
+/* Inform the client that a request it has made has a problem.
+* Parameters: client socket */
+/**********************************************************************/
+static void bad_request(int client_sockfd)
+{
+	memset(outbuf, 0, out_to_browser_buf_size);
+
+	sprintf(outbuf, "HTTP/1.0 400 BAD REQUEST\r\n");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
+	sprintf(outbuf, "Content-type: text/html\r\n");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
+	sprintf(outbuf, "\r\n");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
+	sprintf(outbuf, "<P>Your browser sent a bad request, ");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
+	sprintf(outbuf, "such as a POST without a Content-Length.\r\n");
+	send(client_sockfd, outbuf, sizeof(outbuf), 0);
+}
+
+/**********************************************************************/
+/* Inform the client that a CGI script could not be executed.
+* Parameter: the client socket descriptor. */
+/**********************************************************************/
+static void cannot_execute(int client_sockfd)
+{
+	memset(outbuf, 0, out_to_browser_buf_size);
+
+	sprintf(outbuf, "HTTP/1.0 500 Internal Server Error\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "Content-type: text/html\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<P>Error prohibited CGI execution.\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+}
+
+/**********************************************************************/
+/* Give a client a 404 not found status message. */
+/**********************************************************************/
+static void not_found(int client_sockfd)
+{
+	memset(outbuf, 0, out_to_browser_buf_size);
+
+	sprintf(outbuf, "HTTP/1.0 404 NOT FOUND\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, SERVER_STRING);
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "Content-Type: text/html\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<HTML><TITLE>Not Found</TITLE>\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "<BODY><P>The server could not fulfill\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "your request because the resource specified\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "is unavailable or nonexistent.\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+	sprintf(outbuf, "</BODY></HTML>\r\n");
+	send(client_sockfd, outbuf, strlen(outbuf), 0);
+}
