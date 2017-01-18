@@ -205,6 +205,6 @@ static void log_client_info(struct sockaddr_in *p_client_addr)
 	if (ret_constxt != NULL)
 	{
 		ZF_LOGI("Handling client %s/%i", client_name, ntohs(p_client_addr->sin_port));
-		printf("Handling client %s/%d\n", client_name, ntohs(p_client_addr->sin_port));
+		//printf("Handling client %s/%d\n", client_name, ntohs(p_client_addr->sin_port));
 	}
 }

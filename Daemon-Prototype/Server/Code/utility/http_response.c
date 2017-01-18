@@ -23,14 +23,6 @@ static void cannot_execute(int client_sockfd);
 static void not_found(int client_sockfd);
 
 
-static char outbuf[out_to_browser_buf_size] = { 0 };
-static char method[accept_method_buf_size] = { 0 };
-static char url[accept_url_buf_size] = { 0 };
-static char protocol[accept_protocol_buf_size] = { 0 };
-
-
-
-
 /**********************************************************************/
 /* Inform the client that the requested web method has not been
 * implemented.
@@ -38,7 +30,7 @@ static char protocol[accept_protocol_buf_size] = { 0 };
 /**********************************************************************/
 void unimplemented(int client_sockfd)
 {
-	memset(outbuf, 0, out_to_browser_buf_size);
+	char outbuf[out_to_browser_buf_size] = { 0 };
 
 	sprintf(outbuf, "HTTP/1.0 501 Method Not Implemented\r\n");
 	send(client_sockfd, outbuf, strlen(outbuf), 0);
@@ -61,13 +53,18 @@ void unimplemented(int client_sockfd)
 
 void default_http_response(const int client_sockfd, const char * msg)
 {
+	char outbuf[out_to_browser_buf_size] = { 0 };
+	char method[accept_method_buf_size] = { 0 };
+	char url[accept_url_buf_size] = { 0 };
+	char protocol[accept_protocol_buf_size] = { 0 };
+
 	size_t i = 0;
 	size_t j = 0;
 
-	memset(outbuf, 0, out_to_browser_buf_size);
-	memset(method, 0, accept_method_buf_size);
-	memset(url, 0, accept_url_buf_size);
-	memset(protocol, 0, accept_protocol_buf_size);
+	//memset(outbuf, 0, out_to_browser_buf_size);
+	//memset(method, 0, accept_method_buf_size);
+	//memset(url, 0, accept_url_buf_size);
+	//memset(protocol, 0, accept_protocol_buf_size);
 
 	while (!ISspace(msg[i]) && (i < accept_method_buf_size))
 	{
@@ -135,10 +132,10 @@ void default_http_response(const int client_sockfd, const char * msg)
 /**********************************************************************/
 void serve_file(int client_sockfd, const char *filename)
 {
+	char outbuf[out_to_browser_buf_size] = { 0 };
+
 	FILE *resource = NULL;
 	int numchars = 1;
-	
-	memset(outbuf, 0, out_to_browser_buf_size);
 
 	outbuf[0] = 'A'; outbuf[1] = '\0';
 	while ((numchars > 0) && strcmp("\n", outbuf))  /* read & discard headers */
@@ -164,7 +161,7 @@ void serve_file(int client_sockfd, const char *filename)
 /**********************************************************************/
 void cat(int client_sockfd, FILE *resource)
 {
-	memset(outbuf, 0, out_to_browser_buf_size);
+	char outbuf[out_to_browser_buf_size] = { 0 };
 
 	fgets(outbuf, sizeof(outbuf), resource);
 	while (!feof(resource))
@@ -182,6 +179,8 @@ void cat(int client_sockfd, FILE *resource)
 /**********************************************************************/
 void execute_cgi(const int client_sockfd, const char *path, const char *method, const char *query_string)
 {
+	char outbuf[out_to_browser_buf_size] = { 0 };
+
 	int cgi_output[2];
 	int cgi_input[2];
 	pid_t pid;
@@ -190,8 +189,6 @@ void execute_cgi(const int client_sockfd, const char *path, const char *method, 
 	char c;
 	int numchars = 1;
 	int content_length = -1;
-
-	memset(outbuf, 0, out_to_browser_buf_size);
 
 	outbuf[0] = 'A'; outbuf[1] = '\0';
 	if (strcasecmp(method, "GET") == 0)
@@ -277,9 +274,9 @@ void execute_cgi(const int client_sockfd, const char *path, const char *method, 
 /**********************************************************************/
 static void headers(int client_sockfd, const char *filename)
 {
-	(void)filename;  /* could use filename to determine file type */
+	char outbuf[out_to_browser_buf_size] = { 0 };
 
-	memset(outbuf, 0, out_to_browser_buf_size);
+	(void)filename;  /* could use filename to determine file type */
 
 	strcpy(outbuf, "HTTP/1.0 200 OK\r\n");
 	send(client_sockfd, outbuf, strlen(outbuf), 0);
@@ -297,7 +294,7 @@ static void headers(int client_sockfd, const char *filename)
 /**********************************************************************/
 static void bad_request(int client_sockfd)
 {
-	memset(outbuf, 0, out_to_browser_buf_size);
+	char outbuf[out_to_browser_buf_size] = { 0 };
 
 	sprintf(outbuf, "HTTP/1.0 400 BAD REQUEST\r\n");
 	send(client_sockfd, outbuf, sizeof(outbuf), 0);
@@ -317,7 +314,7 @@ static void bad_request(int client_sockfd)
 /**********************************************************************/
 static void cannot_execute(int client_sockfd)
 {
-	memset(outbuf, 0, out_to_browser_buf_size);
+	char outbuf[out_to_browser_buf_size] = { 0 };
 
 	sprintf(outbuf, "HTTP/1.0 500 Internal Server Error\r\n");
 	send(client_sockfd, outbuf, strlen(outbuf), 0);
@@ -334,7 +331,7 @@ static void cannot_execute(int client_sockfd)
 /**********************************************************************/
 static void not_found(int client_sockfd)
 {
-	memset(outbuf, 0, out_to_browser_buf_size);
+	char outbuf[out_to_browser_buf_size] = { 0 };
 
 	sprintf(outbuf, "HTTP/1.0 404 NOT FOUND\r\n");
 	send(client_sockfd, outbuf, strlen(outbuf), 0);
