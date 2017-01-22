@@ -81,6 +81,8 @@ int startup(unsigned short port)
 
 void error_die(const char *msg)
 {
+	ZF_LOGF("%s", msg);
+
 	perror(msg);
 	exit(1);
 }
@@ -116,21 +118,12 @@ void mainloop_recv(const int server_sockfd)
 static void accept_request(const int client_sockfd)
 {
 	static char buf[accept_line_buf_size] = { 0 };
-	static char method[accept_method_buf_size] = { 0 };
-	static char url[accept_url_buf_size] = { 0 };
-	static char path[accept_path_buf_size];
+	static char additional_msg[accept_method_buf_size] = { 0 };
 
-	int numchars;
-	size_t i, j;
-	struct stat status;
-	char *query_string = NULL;
 	size_t num_bytes_rcvd = 0;
 
 	memset(buf, 0, accept_line_buf_size);
-	memset(method, 0, accept_method_buf_size);
-	memset(url, 0, accept_url_buf_size);
-	memset(path, 0, accept_path_buf_size);
-
+	memset(additional_msg, 0, accept_method_buf_size);
 
 	num_bytes_rcvd = recv(client_sockfd, buf, accept_line_buf_size, 0);
 	
@@ -151,8 +144,8 @@ static void accept_request(const int client_sockfd)
 	}
 
 	
-	sprintf(method, "<hr/>num_bytes_rcvd = %d\r\n", num_bytes_rcvd);
-	strcat(buf, method);
+	sprintf(additional_msg, "<hr/>num_bytes_rcvd = %d\r\n", num_bytes_rcvd);
+	strcat(buf, additional_msg);
 
 	default_http_response(client_sockfd, buf);
 
