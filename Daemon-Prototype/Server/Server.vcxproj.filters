@@ -27,9 +27,6 @@
     <Filter Include="lib\log">
       <UniqueIdentifier>{cf37a85e-fcc3-455f-95b2-96dde04d2c03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib\threadpool">
-      <UniqueIdentifier>{6e4de56b-7b5c-4d34-ad34-9911baebe0a1}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\lib\log\zf_log.h">

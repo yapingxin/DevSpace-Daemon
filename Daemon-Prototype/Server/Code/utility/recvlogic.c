@@ -113,43 +113,6 @@ void mainloop_recv(const int server_sockfd)
 	}
 }
 
-int get_line(const int sockfd, char *buf, const int buf_size)
-{
-	int i = 0;
-	char c = '\0';
-	int count;
-
-	while ((i < buf_size - 1) && (c != '\n'))
-	{
-		count = recv(sockfd, &c, 1, 0);
-		/* DEBUG printf("%02X\n", c); */
-		if (count > 0)
-		{
-			if (c == '\r')
-			{
-				count = recv(sockfd, &c, 1, MSG_PEEK);
-				if ((count > 0) && (c == '\n'))
-				{
-					recv(sockfd, &c, 1, 0);
-				}
-				else
-				{
-					c = '\n';
-				}
-			}
-			buf[i] = c;
-			i++;
-		}
-		else
-		{
-			c = '\n';
-		}
-	}
-	buf[i] = '\0';
-
-	return(i);
-}
-
 
 static void accept_request(const int client_sockfd)
 {
@@ -199,12 +162,12 @@ static void accept_request(const int client_sockfd)
 
 static void log_client_info(struct sockaddr_in *p_client_addr)
 {
-	static char client_name[INET_ADDRSTRLEN] = { 0 };
+	static char client_addr_txt[INET_ADDRSTRLEN] = { 0 };
 
-	const char *ret_constxt = inet_ntop(AF_INET, &p_client_addr->sin_addr.s_addr, client_name, INET_ADDRSTRLEN);
+	const char *ret_constxt = inet_ntop(AF_INET, &p_client_addr->sin_addr.s_addr, client_addr_txt, INET_ADDRSTRLEN);
 	if (ret_constxt != NULL)
 	{
-		ZF_LOGI("Handling client %s/%i", client_name, ntohs(p_client_addr->sin_port));
+		ZF_LOGI("Handling client %s/%i", client_addr_txt, ntohs(p_client_addr->sin_port));
 		//printf("Handling client %s/%d\n", client_name, ntohs(p_client_addr->sin_port));
 	}
 }
