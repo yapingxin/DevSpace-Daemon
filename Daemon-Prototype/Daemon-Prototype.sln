@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Server\Server.vcxproj", "{CA2750C9-873C-4DF6-B6BF-56D2A8143361}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tiny_http_server", "tiny_http_server\tiny_http_server.vcxproj", "{F1C1837D-5D19-46F0-A229-03283A14C2D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -27,6 +29,18 @@ Global
 		{CA2750C9-873C-4DF6-B6BF-56D2A8143361}.Release|x64.Build.0 = Release|x64
 		{CA2750C9-873C-4DF6-B6BF-56D2A8143361}.Release|x86.ActiveCfg = Release|x86
 		{CA2750C9-873C-4DF6-B6BF-56D2A8143361}.Release|x86.Build.0 = Release|x86
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Debug|ARM.ActiveCfg = Debug|ARM
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Debug|ARM.Build.0 = Debug|ARM
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Debug|x64.ActiveCfg = Debug|x64
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Debug|x64.Build.0 = Debug|x64
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Debug|x86.ActiveCfg = Debug|x86
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Debug|x86.Build.0 = Debug|x86
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Release|ARM.ActiveCfg = Release|ARM
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Release|ARM.Build.0 = Release|ARM
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Release|x64.ActiveCfg = Release|x64
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Release|x64.Build.0 = Release|x64
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Release|x86.ActiveCfg = Release|x86
+		{F1C1837D-5D19-46F0-A229-03283A14C2D3}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
