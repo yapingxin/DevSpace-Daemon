@@ -105,7 +105,6 @@ void mainloop_recv(const int server_sockfd)
 
 		log_client_info(&client_addr);
 
-		/* accept_request(client_sockfd); */
 		if (pthread_create(&request_thread, NULL, accept_request, client_sockfd) != 0)
 		{
 			perror("pthread_create");
